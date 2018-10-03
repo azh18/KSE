@@ -1,4 +1,4 @@
-package KSE
+package dal
 
 import (
 	"container/heap"
@@ -8,10 +8,12 @@ import (
 
 const ValidLength = 4
 
+type WordLoc map[string][]int
+
 type Document struct{
 	DocId int
 	Content string
-	Words map[string]int
+	Words WordLoc
 	wordWithMaxWeight *PriorityQueue
 	Magnitude float64
 	NUniqueKeyword int
@@ -23,19 +25,19 @@ func NewDocument(content string, docId int) *Document{
 	newDoc := &Document{
 		DocId: docId,
 		Content: content,
-		Words: map[string]int{},
+		Words: WordLoc{},
 		wordWithMaxWeight: NewPriorityQueue(),
 		Magnitude: 0.0,
 		NUniqueKeyword: 0,
 		MaxTf: 0,
 	}
-	words := map[string]int{}
+	words := WordLoc{}
 
 	checkLetterFunc := func(c rune) bool {
 		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
 	}
 	keywords := strings.FieldsFunc(content, checkLetterFunc) // trim all punctuations, spaces...
-	for _, s := range keywords{
+	for idx, s := range keywords{
 		s = strings.TrimRight(s, "s") // trim 's' at the tail of words
 		s = strings.ToLower(s)
 		if len(s) < ValidLength{ // omit words with length smaller than 4
@@ -43,17 +45,18 @@ func NewDocument(content string, docId int) *Document{
 		}
 		// s in valid, add it to keywords
 		if _, ok := words[s]; !ok{
-			words[s] = 0
+			words[s] = make([]int, 0)
+			words[s] = append(words[s], idx)
 		} else {
-			words[s] += 1
+			words[s]  = append(words[s], idx)
 		}
 	}
 
 	for k := range words{
-		if words[k] > newDoc.MaxTf{
-			newDoc.MaxTf = words[k]
+		if len(words[k]) > newDoc.MaxTf{
+			newDoc.MaxTf = len(words[k])
 		}
-		if words[k] == 1{
+		if len(words[k]) == 1{
 			newDoc.NUniqueKeyword += 1
 		}
 	}
@@ -62,17 +65,22 @@ func NewDocument(content string, docId int) *Document{
 }
 
 // update Magnitude field and wordWithMaxWeight field when knowing document frequency of all words
-func (d *Document) UpdateDocMetaWithDf(docFreq map[string]int){
+func (d *Document) UpdateDocMetaWithDf(getDocFreq func (string) (int, error)) error {
 	sumWeightSquare := 0.0
 	for k, v := range d.Words{
-		idf := 1.0/float64(docFreq[k])
-		weight := float64(v)/float64(d.MaxTf) * idf
+		docFreq, err := getDocFreq(k)
+		if err != nil{
+			return err
+		}
+		idf := 1.0/float64(docFreq)
+		weight := float64(len(v))/float64(d.MaxTf) * idf
 		sumWeightSquare += weight * weight
 		// update wordWithMaxWeight, considering how to implement a priority queue with the fixed length
 		newItem := NewPQItem(weight, k)
 		heap.Push(d.wordWithMaxWeight, newItem)
 	}
 	d.Magnitude = sumWeightSquare / float64(len(d.Words))
+	return nil
 }
 
 func (d *Document) GetMagnitude() float64{
@@ -93,4 +101,8 @@ func (d *Document) GetTop5WeightWords() ([]string, error) {
 
 func (d *Document) GetNUniqueWords() int{
 	return d.NUniqueKeyword
+}
+
+func (d *Document) GetWordsWithLocations() (WordLoc){
+	return d.Words
 }

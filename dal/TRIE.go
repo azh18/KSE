@@ -1,4 +1,4 @@
-package TRIE
+package dal
 
 import (
 	"errors"
