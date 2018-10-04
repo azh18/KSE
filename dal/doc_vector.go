@@ -12,7 +12,7 @@ func (d DocVector) GetCosineSimilarity(a DocVector) float64{
 func (d DocVector) GetMagnitude() float64{
 	sumSquare := 0.0
 	for k := range d{
-		sumSquare += d[k]
+		sumSquare += d[k]*d[k]
 	}
 	return math.Sqrt(sumSquare)
 }
