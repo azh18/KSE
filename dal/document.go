@@ -53,15 +53,14 @@ func NewDocument(content string, docId int) *Document{
 }
 
 // update Magnitude field and wordWithMaxWeight field when knowing document frequency of all words
-func (d *Document) UpdateDocMetaWithDf(getDocFreq func (string) (int, error)) error {
+func (d *Document) UpdateDocMetaWithDf(getDocFreq func (string) (int, error), nTotalDoc int) error {
 	sumWeightSquare := 0.0
 	for k, v := range d.Words{
 		docFreq, err := getDocFreq(k)
 		if err != nil{
 			return err
 		}
-		idf := 1.0/float64(docFreq)
-		weight := float64(len(v))/float64(d.MaxTf) * idf
+		weight := tools.ComputeNormalizeTFIDF(len(v), d.MaxTf, docFreq, nTotalDoc)
 		sumWeightSquare += weight * weight
 		// update wordWithMaxWeight, considering how to implement a priority queue with the fixed length
 		newItem := NewPQItem(weight, k)

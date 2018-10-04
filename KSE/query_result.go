@@ -51,7 +51,7 @@ func (q *Query) Execute() error {
 	// docs do not have same keywords will have a zero inner product, meaning that will not in the ranking
 	// for each match doc, store its id and corresponding matching words with partial product for computing inner product
 	matchDoc := map[int][]wordPartialProduct{}
-	for k:= range queryVector{
+	for k:= range queryVector {
 		docsEntrys := db.index.GetEntriesFromKeyword(k)
 		if docsEntrys == nil{
 			// keyword not in index, do not compute anymore
@@ -65,7 +65,7 @@ func (q *Query) Execute() error {
 			} else {
 				df = df_
 			}
-			wordWeightInDoc := tools.ComputeNormalizeTFIDF(len(docEntry.Location), db.docs[docEntry.DocId].MaxTf, df)
+			wordWeightInDoc := tools.ComputeNormalizeTFIDF(len(docEntry.Location), db.docs[docEntry.DocId].MaxTf, df, len(db.docs))
 			product := queryVector[k] * wordWeightInDoc
 			matchDoc[docEntry.DocId] = append(matchDoc[docEntry.DocId], wordPartialProduct{
 				keyword: k,
@@ -123,12 +123,12 @@ func GetQueryVector(keywords []string, db *Database) dal.DocVector{
 		if err != nil{
 			continue
 		}
-		qVector[k] = tools.ComputeNormalizeTFIDF(tfs[k], maxTf, df)
+		qVector[k] = tools.ComputeNormalizeTFIDF(tfs[k], maxTf, df, len(db.docs))
 	}
 	return qVector
 }
 
-// todo: get top-5 results and print it to return
+// get top-5 results and print it to return
 func (q *Query) GetResult() string {
 	ret := ""
 	allItems, err:= q.rankResult.PopTopK(5)
@@ -143,7 +143,7 @@ func (q *Query) GetResult() string {
 	return ret
 }
 
-// todo: print one result in the format given in homework
+// print one result in the format given in homework
 func (qi *QueryResultItem) String() string{
 	ret := ""
 	ret = ret + strconv.Itoa(qi.docId) + "\n"

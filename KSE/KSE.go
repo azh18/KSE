@@ -48,7 +48,7 @@ func (d *Database) BuildDBFromFile(filename string){
 		d.index.AddWords(docId, d.docs[docId].GetWordsWithLocations())
 	}
 	for docId := range d.docs{
-		if err := d.docs[docId].UpdateDocMetaWithDf(d.index.GetDocumentFreq); err != nil{
+		if err := d.docs[docId].UpdateDocMetaWithDf(d.index.GetDocumentFreq, len(d.docs)); err != nil{
 			panic("cannot find document frequency in inverted index. stop.\n")
 		}
 	}

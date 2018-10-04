@@ -67,14 +67,23 @@ func (h *InvertedIndex) AddWords(docId int, wordLoc WordLoc) error {
 	return nil
 }
 
-// if keyword not in index, return nil todo
-func (h *InvertedIndex) GetEntriesFromKeyword(keyword string) []*PostingEntry{
-	return nil
+// if keyword not in index, return nil
+func (h *InvertedIndex) GetEntriesFromKeyword(keyword string) map[int]*PostingEntry{
+	object, err := h.HeadersTrie.GetObjectFromTrie(keyword)
+	if err != nil{
+		return nil
+	}
+	header := object.(*Header)
+	return header.Entries
 }
 
-//todo
+//get header of posting list given the keyword
 func (h *InvertedIndex) GetHeaderFromKeyword(keyword string) *Header{
-	return nil
+	object, err := h.HeadersTrie.GetObjectFromTrie(keyword)
+	if err != nil{
+		return nil
+	}
+	return object.(*Header)
 }
 
 
