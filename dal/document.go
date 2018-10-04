@@ -2,11 +2,9 @@ package dal
 
 import (
 	"container/heap"
-	"strings"
-	"unicode"
+	"github.com/zbw0046/KSE/tools"
+	"math"
 )
-
-const ValidLength = 4
 
 type WordLoc map[string][]int
 
@@ -26,30 +24,20 @@ func NewDocument(content string, docId int) *Document{
 		DocId: docId,
 		Content: content,
 		Words: WordLoc{},
-		wordWithMaxWeight: NewPriorityQueue(),
+		wordWithMaxWeight: NewPriorityQueue(5, true),
 		Magnitude: 0.0,
 		NUniqueKeyword: 0,
 		MaxTf: 0,
 	}
 	words := WordLoc{}
-
-	checkLetterFunc := func(c rune) bool {
-		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
-	}
-	keywords := strings.FieldsFunc(content, checkLetterFunc) // trim all punctuations, spaces...
-	for idx, s := range keywords{
-		s = strings.TrimRight(s, "s") // trim 's' at the tail of words
-		s = strings.ToLower(s)
-		if len(s) < ValidLength{ // omit words with length smaller than 4
-			continue
-		}
-		// s in valid, add it to keywords
+	keywords := tools.TextPreProcess(content)
+	pos := 0
+	for _, s := range keywords{
 		if _, ok := words[s]; !ok{
 			words[s] = make([]int, 0)
-			words[s] = append(words[s], idx)
-		} else {
-			words[s]  = append(words[s], idx)
 		}
+		words[s]  = append(words[s], pos)
+		pos++
 	}
 
 	for k := range words{
@@ -79,7 +67,7 @@ func (d *Document) UpdateDocMetaWithDf(getDocFreq func (string) (int, error)) er
 		newItem := NewPQItem(weight, k)
 		heap.Push(d.wordWithMaxWeight, newItem)
 	}
-	d.Magnitude = sumWeightSquare / float64(len(d.Words))
+	d.Magnitude = math.Sqrt(sumWeightSquare)
 	return nil
 }
 

@@ -4,10 +4,12 @@ import (
 	"errors"
 )
 
+type Char uint8
+
 type TrieNode struct{
-	char byte // the char of this node
+	char Char // the char of this node
 	data interface{} // the data corresponding to the word (e.g. the header of the posting list)
-	next map[byte]*TrieNode // the link to the longer word
+	next map[Char]*TrieNode // the link to the longer word
 }
 
 type Trie struct{
@@ -15,14 +17,14 @@ type Trie struct{
 }
 
 func NewTrie() *Trie{
-	rootNode := NewTrieNode(byte('r'))
+	rootNode := NewTrieNode('r')
 	return &Trie{rootNode}
 }
 
-func NewTrieNode(char byte) *TrieNode{
+func NewTrieNode(char Char) *TrieNode{
 	return &TrieNode{
 		char: char,
-		next: make(map[byte]*TrieNode),
+		next: make(map[Char]*TrieNode),
 		data: nil,
 	}
 }
@@ -31,7 +33,7 @@ func (t *Trie) AddObjectToTrie(word string, content interface{}) {
 	pNode := t.root
 	idx := 0
 	for idx < len(word){
-		char := byte(word[idx])
+		char := Char(word[idx])
 		if node, ok := pNode.next[char]; ok{
 			pNode = node
 		} else {
@@ -47,12 +49,15 @@ func (t *Trie) GetObjectFromTrie(word string) (interface{}, error) {
 	pNode := t.root
 	idx := 0
 	for idx < len(word){
-		char := byte(word[idx])
+		char := Char(word[idx])
 		var ok bool
 		if pNode, ok = pNode.next[char]; !ok{
 			return nil, errors.New("No this object\n")
 		}
 		idx++
+	}
+	if pNode.data == nil{
+		return nil, errors.New("No data in this node.\n")
 	}
 	return pNode.data, nil
 }

@@ -2,6 +2,8 @@ package dal
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 )
 
 type PostingEntry struct{
@@ -65,9 +67,17 @@ func (h *InvertedIndex) AddWords(docId int, wordLoc WordLoc) error {
 	return nil
 }
 
+// if keyword not in index, return nil todo
 func (h *InvertedIndex) GetEntriesFromKeyword(keyword string) []*PostingEntry{
 	return nil
 }
+
+//todo
+func (h *InvertedIndex) GetHeaderFromKeyword(keyword string) *Header{
+	return nil
+}
+
+
 
 func (h *InvertedIndex) GetDocumentFreq(word string) (int, error) {
 	if headerObject, err := h.HeadersTrie.GetObjectFromTrie(word); err == nil{
@@ -75,4 +85,17 @@ func (h *InvertedIndex) GetDocumentFreq(word string) (int, error) {
 	} else {
 		return -1, errors.New("the word is not found.\n")
 	}
+}
+
+func (pl *PostingList) String() string {
+	ret := "|"
+	for _, e := range pl.Entries{
+		ret = ret + "D" + strconv.Itoa(e.DocId) + ":"
+		str1 := make([]string, 0)
+		for _, l := range e.Location{
+			str1 = append(str1, strconv.Itoa(l))
+		}
+		ret = ret + strings.Join(str1, ",") + "|"
+	}
+	return ret
 }

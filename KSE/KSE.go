@@ -2,8 +2,8 @@ package KSE
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/zbw0046/KSE/dal"
-	"github.com/zbw0046/KSE/query"
 	"os"
 )
 
@@ -56,6 +56,10 @@ func (d *Database) BuildDBFromFile(filename string){
 }
 
 func (d *Database) Query(keywords string) string {
-	queryResult := query.ExecuteQuery(keywords)
-	return queryResult.String()
+	q := NewQuery(keywords, d)
+	if err := q.Execute(); err != nil{
+		ret := fmt.Sprintf("Error occured while querying. err=\n%+=v\n", err)
+		return ret
+	}
+	return q.GetResult()
 }
