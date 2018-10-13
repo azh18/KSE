@@ -63,7 +63,8 @@ func (d *Document) UpdateDocMetaWithDf(getDocFreq func (string) (int, error), nT
 		weight := tools.ComputeNormalizeTFIDF(len(v), d.MaxTf, docFreq, nTotalDoc)
 		sumWeightSquare += weight * weight
 		// update wordWithMaxWeight, considering how to implement a priority queue with the fixed length
-		newItem := NewPQItem(weight, k)
+		priority := weight * 1000000 + GetStringPriority(k)/1000
+		newItem := NewPQItem(priority, k)
 		heap.Push(d.wordWithMaxWeight, newItem)
 	}
 	d.Magnitude = math.Sqrt(sumWeightSquare)
@@ -94,4 +95,8 @@ func (d *Document) GetNUniqueWords() int{
 
 func (d *Document) GetWordsWithLocations() (WordLoc){
 	return d.Words
+}
+
+func GetStringPriority(s string) float64{
+	return float64(s[3] + s[2]*26 + s[1]*26*26+ s[0]*26*26*26)/(26*26*26*26)
 }

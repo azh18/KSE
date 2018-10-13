@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/zbw0046/KSE/dal"
 	"github.com/zbw0046/KSE/tools"
+	"sort"
 	"strconv"
 )
 
@@ -149,9 +150,14 @@ func (q *Query) GetResult() string {
 func (qi *QueryResultItem) String() string{
 	ret := ""
 	ret = ret + "DID: " + strconv.Itoa(qi.docId) + "\n"
-	for k, pl := range qi.Top5PostingLists{
+	s := make([]string, 0)
+	for k := range qi.Top5PostingLists{
+		s = append(s, k)
+	}
+	sort.Strings(s)
+	for _, k := range s{
 		ret = ret + k + " -> "
-		ret = ret + pl.String() + "\n"
+		ret = ret + qi.Top5PostingLists[k].String() + "\n"
 	}
 	ret = ret + "Number of unique keywords in document: " + strconv.Itoa(qi.NUniqueWordsInDoc) + "\n"
 	ret = ret + "Magnitude of the document vector (L2 norm): " + strconv.FormatFloat(qi.MagDoc, 'f', 2 ,64) + "\n"

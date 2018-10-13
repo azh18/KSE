@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"sort"
 	"strings"
 	"unicode"
 )
@@ -24,4 +25,13 @@ func TextPreProcess(text string) []string{
 		ret = append(ret, s)
 	}
 	return ret
+}
+
+func GetSortedKeysOfMap(m map[string]float64) []string{
+	s := make([]string, 0)
+	for k := range m{
+		s = append(s, k)
+	}
+	sort.Strings(s)
+	return s
 }

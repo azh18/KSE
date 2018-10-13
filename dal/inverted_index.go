@@ -2,6 +2,7 @@ package dal
 
 import (
 	"errors"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -98,7 +99,13 @@ func (h *InvertedIndex) GetDocumentFreq(word string) (int, error) {
 
 func (pl *PostingList) String() string {
 	ret := "|"
-	for _, e := range pl.Entries{
+	s := make([]int, 0)
+	for k := range pl.Entries{
+		s = append(s, k)
+	}
+	sort.Ints(s)
+	for _, k := range s{
+		e := pl.Entries[k]
 		ret = ret + "D" + strconv.Itoa(e.DocId) + ":"
 		str1 := make([]string, 0)
 		for _, l := range e.Location{
