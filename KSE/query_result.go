@@ -98,7 +98,7 @@ func (q *Query) Execute() error {
 			MagDoc: db.docs[docId].GetMagnitude(),
 			SimilarityScore: cosineSimilarity,
 		}
-		pqItem := dal.NewPQItem(cosineSimilarity, queryResultItem)
+		pqItem := dal.NewPQItem(cosineSimilarity*100000+float64(docId)/100000, queryResultItem)
 		heap.Push(ret, pqItem)
 	}
 	q.rankResult = ret
