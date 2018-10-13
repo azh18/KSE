@@ -22,6 +22,7 @@ func NewDatabase(filename string) *Database{
 	return db
 }
 
+// The entrance of importing data and building index
 func (d *Database) BuildDBFromFile(filename string){
 	// phase 1: read data into documents database
 	docId := 0
@@ -55,8 +56,9 @@ func (d *Database) BuildDBFromFile(filename string){
 	return
 }
 
-func (d *Database) Query(keywords string) string {
-	q := NewQuery(keywords, d)
+// The entrance of executing the query
+func (d *Database) Query(keywords string, kValue int) string {
+	q := NewQuery(keywords, d, kValue)
 	if err := q.Execute(); err != nil{
 		ret := fmt.Sprintf("Error occured while querying. err=\n%+=v\n", err)
 		return ret

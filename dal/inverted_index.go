@@ -87,7 +87,7 @@ func (h *InvertedIndex) GetHeaderFromKeyword(keyword string) *Header{
 }
 
 
-
+// Get the df of a word from the record in inverted index
 func (h *InvertedIndex) GetDocumentFreq(word string) (int, error) {
 	if headerObject, err := h.HeadersTrie.GetObjectFromTrie(word); err == nil{
 		return headerObject.(*Header).DocFreq, nil

@@ -12,6 +12,7 @@ type Query struct{
 	keywords string
 	db *Database
 	rankResult *QueryResult
+	kValue int
 }
 
 type QueryResultItem struct{
@@ -30,13 +31,14 @@ type wordPartialProduct struct{
 	partialProduct float64
 }
 
-func NewQuery(keywords string, db *Database) *Query{
+func NewQuery(keywords string, db *Database, kValue int) *Query{
 	if db == nil{
 		return nil
 	}
 	return &Query{
 		keywords:keywords,
 		db:db,
+		kValue:kValue,
 	}
 }
 
@@ -131,7 +133,7 @@ func GetQueryVector(keywords []string, db *Database) dal.DocVector{
 // get top-5 results and print it to return
 func (q *Query) GetResult() string {
 	ret := ""
-	allItems, err:= q.rankResult.PopTopK(q.rankResult.Len())
+	allItems, err:= q.rankResult.PopTopK(q.kValue)
 	if err != nil{
 		panic("panic")
 	}
@@ -146,7 +148,7 @@ func (q *Query) GetResult() string {
 // print one result in the format given in homework
 func (qi *QueryResultItem) String() string{
 	ret := ""
-	ret = ret + strconv.Itoa(qi.docId) + "\n"
+	ret = ret + "DID: " + strconv.Itoa(qi.docId) + "\n"
 	for k, pl := range qi.Top5PostingLists{
 		ret = ret + k + " -> "
 		ret = ret + pl.String() + "\n"

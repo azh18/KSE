@@ -74,6 +74,7 @@ func (d *Document) GetMagnitude() float64{
 	return d.Magnitude
 }
 
+// Get top-5 words with the maximum weight
 func (d *Document) GetTop5WeightWords() ([]string, error) {
 	newQueue := d.wordWithMaxWeight.Copy()
 	top5Items, err := newQueue.PopTopK(5)

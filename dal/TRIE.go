@@ -29,6 +29,7 @@ func NewTrieNode(char Char) *TrieNode{
 	}
 }
 
+// Add an element into the Trie
 func (t *Trie) AddObjectToTrie(word string, content interface{}) {
 	pNode := t.root
 	idx := 0
@@ -45,6 +46,7 @@ func (t *Trie) AddObjectToTrie(word string, content interface{}) {
 	pNode.data = content
 }
 
+// Get the elements of leaves according to the word
 func (t *Trie) GetObjectFromTrie(word string) (interface{}, error) {
 	pNode := t.root
 	idx := 0
