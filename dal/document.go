@@ -75,7 +75,8 @@ func (d *Document) GetMagnitude() float64{
 }
 
 func (d *Document) GetTop5WeightWords() ([]string, error) {
-	top5Items, err := d.wordWithMaxWeight.PopTopK(5)
+	newQueue := d.wordWithMaxWeight.Copy()
+	top5Items, err := newQueue.PopTopK(5)
 	if err != nil{
 		return nil, err
 	}

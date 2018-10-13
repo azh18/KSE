@@ -45,6 +45,16 @@ func NewPriorityQueue(pqSize int, isMinHeap bool) *PriorityQueue{
 	return pq
 }
 
+func (pq *PriorityQueue) Copy() *PriorityQueue{
+	newPq := &PriorityQueue{
+		PqSize:pq.PqSize,
+		IsMinHeap:pq.IsMinHeap,
+		Content:make([]*PQItem, pq.PqSize),
+	}
+	copy(newPq.Content, pq.Content)
+	return newPq
+}
+
 func (pq PriorityQueue) Len() int { return len(pq.Content) }
 
 func (pq PriorityQueue) Less(i, j int) bool {

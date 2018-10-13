@@ -131,7 +131,7 @@ func GetQueryVector(keywords []string, db *Database) dal.DocVector{
 // get top-5 results and print it to return
 func (q *Query) GetResult() string {
 	ret := ""
-	allItems, err:= q.rankResult.PopTopK(5)
+	allItems, err:= q.rankResult.PopTopK(q.rankResult.Len())
 	if err != nil{
 		panic("panic")
 	}
